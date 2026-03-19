@@ -1,0 +1,128 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/naamasetogutte/InteligenciaArtificial/blob/main/Trabalho%20Aula04\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "\n",
+        "data = [\n",
+        "[\"infantil\",\"miopia\",\"não\",\"reduzida\",\"nenhuma\"],\n",
+        "[\"infantil\",\"miopia\",\"sim\",\"normal\",\"gelatinosa\"],\n",
+        "[\"infantil\",\"hipermetropia\",\"não\",\"normal\",\"gelatinosa\"],\n",
+        "[\"infantil\",\"hipermetropia\",\"sim\",\"normal\",\"dura\"],\n",
+        "[\"adolescente\",\"miopia\",\"não\",\"reduzida\",\"gelatinosa\"],\n",
+        "[\"adolescente\",\"miopia\",\"sim\",\"reduzida\",\"nenhuma\"],\n",
+        "[\"adolescente\",\"miopia\",\"não\",\"normal\",\"dura\"],\n",
+        "[\"adolescente\",\"hipermetropia\",\"não\",\"reduzida\",\"gelatinosa\"],\n",
+        "[\"adolescente\",\"hipermetropia\",\"sim\",\"normal\",\"dura\"],\n",
+        "[\"adulto\",\"miopia\",\"não\",\"normal\",\"gelatinosa\"],\n",
+        "[\"adulto\",\"miopia\",\"sim\",\"normal\",\"dura\"],\n",
+        "[\"adulto\",\"miopia\",\"sim\",\"reduzida\",\"gelatinosa\"],\n",
+        "[\"adulto\",\"hipermetropia\",\"não\",\"reduzida\",\"nenhuma\"],\n",
+        "[\"adulto\",\"hipermetropia\",\"sim\",\"normal\",\"gelatinosa\"],\n",
+        "[\"adulto\",\"hipermetropia\",\"não\",\"normal\",\"gelatinosa\"],\n",
+        "]\n",
+        "\n",
+        "df = pd.DataFrame(data, columns=[\"idade\",\"diagnostico\",\"astigmatismo\",\"lacrimal\",\"classe\"])\n",
+        "\n",
+        "paciente = [\"infantil\",\"hipermetropia\",\"não\",\"reduzida\"]\n",
+        "\n",
+        "classes = df[\"classe\"].unique()\n",
+        "atributos = [\"idade\",\"diagnostico\",\"astigmatismo\",\"lacrimal\"]\n",
+        "\n",
+        "resultado = {}\n",
+        "expressoes = {}\n",
+        "\n",
+        "print(\"Probs condicionais de cada hipótese\\n\")\n",
+        "\n",
+        "for c in classes:\n",
+        "    subset = df[df[\"classe\"] == c]\n",
+        "\n",
+        "    prob = len(subset) / len(df)\n",
+        "    expressao = f\"{len(subset)}/{len(df)}\"\n",
+        "\n",
+        "    for i, attr in enumerate(atributos):\n",
+        "        valores = df[attr].unique()\n",
+        "        k = len(valores)\n",
+        "\n",
+        "        count = len(subset[subset[attr] == paciente[i]])\n",
+        "\n",
+        "        num = count + 1\n",
+        "        den = len(subset) + k\n",
+        "\n",
+        "        prob *= num / den\n",
+        "        expressao += f\"*{num}/{den}\"\n",
+        "\n",
+        "    resultado[c] = prob\n",
+        "    expressoes[c] = expressao\n",
+        "\n",
+        "    print(f\"P[{c.capitalize()}|E] = {expressao} = {prob:.6f}\")\n",
+        "\n",
+        "print(\"\\nNormalizando as probs\\n\")\n",
+        "\n",
+        "total = sum(resultado.values())\n",
+        "\n",
+        "for c in resultado:\n",
+        "    normalizado = resultado[c] / total\n",
+        "    resultado[c] = normalizado\n",
+        "\n",
+        "    print(f\"P[{c.capitalize()}|E] = {resultado[c]:.6f}/{total:.6f} = {normalizado*100:.2f}%\")\n",
+        "\n",
+        "previsao = max(resultado, key=resultado.get)\n",
+        "print(f\"\\nA previsão para o exemplo dado seria Lente = {previsao.capitalize()}\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jvfzKLTHVai2",
+        "outputId": "70c60c50-b26c-49cf-99f5-d05ba4b27ce8"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Probs condicionais de cada hipótese\n",
+            "\n",
+            "P[Nenhuma|E] = 3/15*2/6*2/5*3/5*4/5 = 0.012800\n",
+            "P[Gelatinosa|E] = 8/15*3/11*5/10*6/10*4/10 = 0.017455\n",
+            "P[Dura|E] = 4/15*2/7*3/6*2/6*1/6 = 0.002116\n",
+            "\n",
+            "Normalizando as probs\n",
+            "\n",
+            "P[Nenhuma|E] = 0.395416/0.032371 = 39.54%\n",
+            "P[Gelatinosa|E] = 0.539204/0.032371 = 53.92%\n",
+            "P[Dura|E] = 0.065380/0.032371 = 6.54%\n",
+            "\n",
+            "A previsão para o exemplo dado seria Lente = Gelatinosa\n"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "toc_visible": true,
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
